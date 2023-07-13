@@ -1,7 +1,7 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from config.models.TimeStampMixin import TimeStampMixin
 from phonenumber_field.modelfields import PhoneNumberField
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 
 class UserManager(BaseUserManager):
@@ -17,6 +17,7 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, phone, email=None, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('is_superuser', True)
         
         if email is None:

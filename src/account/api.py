@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from .serializers import UserSerializer, LoginSerializer
 
 User = get_user_model()
@@ -41,11 +41,21 @@ class LoginAPI(APIView):
         phone = serializer.validated_data['phone']
         password = serializer.validated_data['password']
         user = authenticate(phone=phone, password=password)
+
         if user is not None:
+            # Generate tokens
+            refresh = RefreshToken.for_user(user)
+            access = AccessToken.for_user(user)
             token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key})
-        else:
-            return Response({'error': 'Invalid credentials'}, status=400)
+
+            # Create response data
+            response_data = {
+                'refresh_token': str(refresh),
+                'access_token': str(access),
+                'token': (token.key), # For testing
+            }
+            return Response(response_data)
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
         
 class LogoutAPI(APIView):
     authentication_classes = [TokenAuthentication]
