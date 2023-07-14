@@ -52,6 +52,7 @@ CUSTOM_INSTALL_APPS = [
 
     # Install apps
     'account',
+    'organizations',
 
 ]
 
