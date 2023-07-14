@@ -5,6 +5,7 @@ from .models import Organization, OrganizationEmployee, OrganizationConnection
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('organization_name', 'website')
+    readonly_fields = ("slug", 'created_at', 'updated_at', 'uid')
 
 
 @admin.register(OrganizationEmployee)

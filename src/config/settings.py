@@ -45,7 +45,6 @@ DEFAULT_APPS = [
 CUSTOM_INSTALL_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_framework_simplejwt.token_blacklist',
     'django_q',
     'drf_spectacular',
 
@@ -53,6 +52,7 @@ CUSTOM_INSTALL_APPS = [
     # Install apps
     'account',
     'organizations',
+    'store',
 
 ]
 
