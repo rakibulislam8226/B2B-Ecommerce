@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
 from drf_spectacular.views import SpectacularSwaggerView, SpectacularAPIView, SpectacularRedocView
 
 
@@ -18,3 +19,7 @@ urlpatterns = [
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
 ]
+
+admin.site.site_header = settings.APP_SITE_HEADER
+admin.site.site_title = settings.APP_SITE_TITLE
+admin.site.index_title = settings.APP_INDEX_TITLE

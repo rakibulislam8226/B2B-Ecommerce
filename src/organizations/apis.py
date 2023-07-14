@@ -15,28 +15,27 @@ class CreateOrganizationAPI(generics.CreateAPIView):
 class OrganizationEmployeeAPIView(APIView):
     """Organizations Employees all api"""
 
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAuthenticated] # create custom permission
 
     def get(self, request, pk=None):
-        try:
-            if pk:
+        if pk is not None:
+            try:
                 organization_employees = OrganizationEmployee.objects.get(pk=pk)
                 serializer = OrganizationEmployeeSerializer(organization_employees)
                 return Response(serializer.data)
-        except OrganizationEmployee.DoesNotExist:
-            return Response({"error": "Organization employee not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        organization_employees = OrganizationEmployee.objects.all()
+            except OrganizationEmployee.DoesNotExist:
+                return Response({"error": "Organization employee not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        organization_employees = OrganizationEmployee.objects.filter()
         serializer = OrganizationEmployeeSerializer(organization_employees, many=True)
         return Response(serializer.data)
     
     #FIXME: If employee is already created in a organization then same employee can not be create again in same organizations.
     def post(self, request, pk=None):
         serializer = OrganizationEmployeeSerializer(data=request.data)
-        if serializer.is_valid():
-            organization_employees = serializer.save()
-            return Response(OrganizationEmployeeSerializer(organization_employees).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        organization_employees = serializer.save()
+        return Response(OrganizationEmployeeSerializer(organization_employees).data, status=status.HTTP_201_CREATED)
     
 
     def put(self, request, pk, format=None):
@@ -46,10 +45,9 @@ class OrganizationEmployeeAPIView(APIView):
             return Response({"error": "Employee not found."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = OrganizationEmployeeSerializer(organization_employees, data=request.data)
-        if serializer.is_valid():
-            organization_employees = serializer.save()
-            return Response(OrganizationEmployeeSerializer(organization_employees).data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        organization_employees = serializer.save()
+        return Response(OrganizationEmployeeSerializer(organization_employees).data)
     
 
     def delete(self, request, pk):
@@ -66,11 +64,11 @@ class CreateOrganizationsConnectionsAPI(generics.CreateAPIView):
 
     #FIXME: the request will be auto detect by from_organization. only to_organizations have to set.
     serializer_class = OrganizationConnectionSerializer
-    permission_classes = [IsAuthenticated] # It might be custom permissions
+    permission_classes = [IsAuthenticated] # It might be custom permissions only owner can send connection request.
 
 
 class OrganizationConnectionAPI(generics.RetrieveUpdateAPIView):
-    queryset = OrganizationConnection.objects.all()
+    queryset = OrganizationConnection.objects.filter()
     serializer_class = OrganizationConnectionSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated] # only permitted user can change the connection status
     lookup_field = 'id'

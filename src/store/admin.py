@@ -6,7 +6,7 @@ from .models import Category, Products
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug')
+    list_display = ('name', 'uid', 'slug')
     readonly_fields = ("slug", 'created_at', 'updated_at', 'uid')
     search_fields = ( 'name',)
 

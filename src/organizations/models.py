@@ -1,4 +1,5 @@
 from django.db import models
+import uuid
 from config.models.TimeStampMixin import TimeStampMixin
 from django.contrib.auth import get_user_model
 from autoslug import AutoSlugField
@@ -8,7 +9,8 @@ from .choices import EMPLOYEE_ROLE, CONNECTION_STATUS
 # Create your models here.
 User = get_user_model()
 
-class Address(models.Model):
+class Address(TimeStampMixin):
+    uid = models.UUIDField(default=uuid.uuid4, editable=False) 
     house_no = models.CharField(max_length=30)
     village = models.CharField(max_length=100)
     post_office = models.CharField(max_length=10)
@@ -38,7 +40,7 @@ class OrganizationEmployee(TimeStampMixin):
     """Employee of an organizations based on roles"""
     
     user = models.ManyToManyField(User, related_name = 'user', help_text='It is employee of the comapny.')
-    slug = AutoSlugField(populate_from=('user__email'), max_length=255, editable=False)
+    slug = AutoSlugField(populate_from=('role'), max_length=255, editable=False)
     organization = models.ForeignKey(Organization, on_delete=models.RESTRICT)
     role = models.CharField(max_length=255, choices=EMPLOYEE_ROLE, default='Customer')
     is_default = models.BooleanField(default=False)

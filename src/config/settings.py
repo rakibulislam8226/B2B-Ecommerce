@@ -173,7 +173,7 @@ SPECTACULAR_SETTINGS = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=3),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
   }
 
@@ -203,3 +203,6 @@ Q_CLUSTER = {
     }
 }
 
+APP_SITE_HEADER = os.environ.get('APP_SITE_HEADER', 'B2B')
+APP_SITE_TITLE = os.environ.get('APP_SITE_TITLE', 'B2B Admin')
+APP_INDEX_TITLE = os.environ.get('APP_INDEX_TITLE', 'Welcome to B2B Admin')

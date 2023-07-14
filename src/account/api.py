@@ -14,22 +14,20 @@ User = get_user_model()
 class RegisterUserAPIView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
 
-            refresh = RefreshToken.for_user(user)
+        refresh = RefreshToken.for_user(user)
+        token = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
 
-            token = {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }
-            response_data = {
-                'user': serializer.data,
-                'token': token
-            }
-
-            return Response(response_data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        response_data = {
+            'user': serializer.data,
+            'token': token
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 class LoginAPI(APIView):
@@ -56,6 +54,7 @@ class LoginAPI(APIView):
             }
             return Response(response_data)
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+       
         
 class LogoutAPI(APIView):
     authentication_classes = [TokenAuthentication]

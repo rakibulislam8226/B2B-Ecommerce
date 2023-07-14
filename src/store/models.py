@@ -8,7 +8,7 @@ User = get_user_model()
 
 
 class Category(TimeStampMixin):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255) # will be unique?
     slug = AutoSlugField(populate_from='name', max_length=255, editable=False)
     description = models.TextField()
 
