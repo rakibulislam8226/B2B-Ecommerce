@@ -2,8 +2,8 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .models import OrganizationEmployee
-from .serializers import OrganizationSerializer, OrganizationEmployeeSerializer
+from .models import OrganizationEmployee, OrganizationConnection
+from .serializers import OrganizationSerializer, OrganizationEmployeeSerializer, OrganizationConnectionSerializer
 
 
 
@@ -13,6 +13,8 @@ class CreateOrganizationAPI(generics.CreateAPIView):
 
 
 class OrganizationEmployeeAPIView(APIView):
+    """Organizations Employees all api"""
+
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get(self, request, pk=None):
@@ -58,3 +60,17 @@ class OrganizationEmployeeAPIView(APIView):
 
         organization_employees.delete()
         return Response({"success": "Employee delete successfully."}, status=status.HTTP_204_NO_CONTENT)
+
+
+class CreateOrganizationsConnectionsAPI(generics.CreateAPIView):
+
+    #FIXME: the request will be auto detect by from_organization. only to_organizations have to set.
+    serializer_class = OrganizationConnectionSerializer
+    permission_classes = [IsAuthenticated] # It might be custom permissions
+
+
+class OrganizationConnectionAPI(generics.RetrieveUpdateAPIView):
+    queryset = OrganizationConnection.objects.all()
+    serializer_class = OrganizationConnectionSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'id'
