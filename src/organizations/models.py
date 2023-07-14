@@ -40,10 +40,23 @@ class OrganizationEmployee(TimeStampMixin):
         return f'{self.slug}'
 
     def save(self, *args, **kwargs):
-        if not self.id:
-            self.slug = slugify(f'{self.organization}-{self.role}')
+        self.slug = slugify(f'{self.organization}-{self.role}')
         super().save(*args, **kwargs)
     
     class Meta:
         verbose_name = "Organizations Employee" 
+        ordering = ('-id', )
+
+
+class OrganizationConnection(TimeStampMixin):
+
+    from_organization = models.ForeignKey(Organization, on_delete=models.RESTRICT, related_name='from_organization')
+    to_organization = models.ForeignKey(Organization, on_delete=models.RESTRICT, related_name='to_organization')
+    connection_type = models.CharField(max_length=255, choices=CONNECTION_STATUS, default='Pending')
+
+    def __str__(self) -> str:
+        return f'{self.from_organization} -- {self.to_organization}'
+    
+    class Meta:
+        verbose_name = "Organizations Connection" 
         ordering = ('-id', )

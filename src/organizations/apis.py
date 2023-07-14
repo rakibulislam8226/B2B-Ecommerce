@@ -28,10 +28,33 @@ class OrganizationEmployeeAPIView(APIView):
         serializer = OrganizationEmployeeSerializer(organization_employees, many=True)
         return Response(serializer.data)
     
+    #FIXME: If employee is already created in a organization then same employee can not be create again in same organizations.
     def post(self, request, pk=None):
         serializer = OrganizationEmployeeSerializer(data=request.data)
         if serializer.is_valid():
             organization_employees = serializer.save()
             return Response(OrganizationEmployeeSerializer(organization_employees).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
+    def put(self, request, pk, format=None):
+        try:
+            organization_employees = OrganizationEmployee.objects.get(pk=pk)
+        except OrganizationEmployee.DoesNotExist:
+            return Response({"error": "Employee not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = OrganizationEmployeeSerializer(organization_employees, data=request.data)
+        if serializer.is_valid():
+            organization_employees = serializer.save()
+            return Response(OrganizationEmployeeSerializer(organization_employees).data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    def delete(self, request, pk):
+        try:
+            organization_employees = OrganizationEmployee.objects.get(pk=pk)
+        except OrganizationEmployee.DoesNotExist:
+            return Response({"error": "Employee not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        organization_employees.delete()
+        return Response({"success": "Employee delete successfully."}, status=status.HTTP_204_NO_CONTENT)
