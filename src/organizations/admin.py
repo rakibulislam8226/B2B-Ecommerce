@@ -1,10 +1,14 @@
 from django.contrib import admin
-from .models import Organization, OrganizationEmployee, OrganizationConnection
+from .models import Address, Organization, OrganizationEmployee, OrganizationConnection
 
 # Register your models here.
+@admin.register(Address)
+class AddressAdmin(admin.ModelAdmin):
+    list_display = ('house_no', 'village', 'post_office', 'thana', 'district')
+
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
-    list_display = ('organization_name', 'website')
+    list_display = ('name', 'website')
     readonly_fields = ("slug", 'created_at', 'updated_at', 'uid')
 
 
