@@ -39,7 +39,7 @@ class Organization(TimeStampMixin):
 class OrganizationEmployee(TimeStampMixin):
     """Employee of an organizations based on roles"""
     
-    user = models.ManyToManyField(User, related_name = 'user', help_text='It is employee of the comapny.')
+    user = models.ManyToManyField(User, related_name = 'organization_employee', help_text='It is employee of the comapny.')
     slug = AutoSlugField(populate_from=('role'), max_length=255, editable=False)
     organization = models.ForeignKey(Organization, on_delete=models.RESTRICT)
     role = models.CharField(max_length=255, choices=EMPLOYEE_ROLE, default='Customer')

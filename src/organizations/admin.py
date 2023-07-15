@@ -16,6 +16,7 @@ class OrganizationAdmin(admin.ModelAdmin):
 @admin.register(OrganizationEmployee)
 class OrganizationEmployeeAdmin(admin.ModelAdmin):
     list_display = ('slug', 'organization', 'role', 'is_default')
+    list_editable = ('is_default',)
     search_fields = ( 'user__email', 'user__phone')
     list_filter = ('role',)
     readonly_fields = ("slug", 'created_at', 'updated_at', 'uid')
