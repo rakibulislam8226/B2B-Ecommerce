@@ -1,10 +1,28 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, viewsets
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .models import OrganizationEmployee, OrganizationConnection
-from .serializers import OrganizationSerializer, OrganizationEmployeeSerializer, OrganizationConnectionSerializer
+from .models import OrganizationEmployee, OrganizationConnection, Address
+from .serializers import OrganizationSerializer, OrganizationEmployeeSerializer, OrganizationConnectionSerializer, \
+                        AddressSerializer
 
+
+class AddressListAPI(generics.ListCreateAPIView):
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+
+
+class AddressDetailAPI(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+    lookup_field = 'uid'
+
+    def destroy(self, request, *args, **kwargs):
+        """Just for show the confirmations the deleted response"""
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({'detail': 'Address deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
 
 
 class CreateOrganizationAPI(generics.CreateAPIView):

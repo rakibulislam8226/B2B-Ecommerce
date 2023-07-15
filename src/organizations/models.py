@@ -19,6 +19,10 @@ class Address(TimeStampMixin):
 
     def __str__(self) -> str:
         return f'{self.house_no}'
+    
+    @property
+    def address(self):
+        return f'{self.house_no}, {self.village}, {self.post_office}, {self.thana}, {self.district}'
 
 
 class Organization(TimeStampMixin):

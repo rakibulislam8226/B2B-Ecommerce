@@ -7,6 +7,17 @@ from account.serializers import UserSerializer
 User = get_user_model()
 
 
+class AddressSerializer(serializers.ModelSerializer):
+    address = serializers.SerializerMethodField()
+    class Meta:
+        model = Address
+        fields = ('uid', 'house_no', 'village', 'post_office', 'thana', 'district', 'address')
+        read_only_fields = ('uid', 'address')
+
+    def address(self, obj):
+        return obj.address
+
+
 class OrganizationSerializer(serializers.ModelSerializer):
     address = serializers.SlugRelatedField(slug_field='uid', queryset=Address.objects.filter())
     category = serializers.SlugRelatedField(slug_field='uid', queryset=Category.objects.filter())
