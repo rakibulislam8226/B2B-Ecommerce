@@ -101,15 +101,15 @@ WSGI_APPLICATION = 'config.wsgi.application'
 #     }
 # }
 
-
+#FIXME: docker file not getting .env
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'db_name'),
-        'USER': os.getenv('POSTGRES_USER', 'db_user'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'db_password'),
-        'HOST':  os.getenv('POSTGRES_HOST', 'localhost'),
-        'PORT':  os.getenv('POSTGRES_PORT', '5432'),
+        'NAME': os.getenv('POSTGRES_DB', 'assesment_b2b'),
+        'USER': os.getenv('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
+        'HOST':  os.getenv('POSTGRES_HOST', 'db'),
+        'PORT':  os.getenv('POSTGRES_PORT', 5432),
     }
 }
 

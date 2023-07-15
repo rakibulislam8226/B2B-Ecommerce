@@ -2,6 +2,7 @@ version: "3.10"
 
 services:
   src:
+    restart: always
     build:
       context: .
     ports:
@@ -18,10 +19,10 @@ services:
     image: postgres:13-alpine
     container_name: b2b-assesment-postgres
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=demopassword
-      - POSTGRES_DB=b2b_assesment
-      - POSTGRES_PORT=5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: assesment_b2b
+      POSTGRES_PORT: 5432
     # ports:
     #   - "5433:5432"
     volumes:
