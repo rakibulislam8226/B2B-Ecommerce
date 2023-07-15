@@ -37,3 +37,32 @@ class Products(TimeStampMixin):
         ordering = ('-id', )
 
     
+class Cart(TimeStampMixin):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    @property
+    def total_price(self):
+        total = 0
+        for item in self.items.all():
+            total += item.product.price * item.quantity
+        return total
+    
+    def __str__(self) -> str:
+        return f'{self.user}'
+    
+    class Meta:
+        verbose_name = "Cart" 
+        ordering = ('-id', )
+
+
+class CartItem(TimeStampMixin):
+    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self) -> str:
+        return f'{self.product}'
+    
+    class Meta:
+        verbose_name = "CartItem" 
+        ordering = ('-id', )

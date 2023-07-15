@@ -7,7 +7,7 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ('phone', 'email', 'is_active')
     list_editable = ('is_active',)
     search_fields = ( 'email', 'phone')
-    readonly_fields = ("id", 'uid', 'created_at', 'updated_at', 'phone', 'email', 'password')
+    readonly_fields = ("id", 'uid', 'created_at', 'updated_at', 'password')
     fieldsets = (
       (None, {
           'fields': ('id', 'uid', 'phone', 'email', 'password', 'last_login', 'groups', 'user_permissions', 'is_active', 

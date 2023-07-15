@@ -1,6 +1,6 @@
 from rest_framework.permissions import BasePermission
 from rest_framework.exceptions import PermissionDenied
-from .models import Products
+from .models import Products, Cart
 
 
 class IsInOrganization(BasePermission):
@@ -35,3 +35,12 @@ class IsOrganizationAdminOrOwner(BasePermission):
         except Exception as e:
             raise PermissionDenied("Invalid permission")
         return False
+    
+
+class IsUserCartOwner(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated
+    
+    def has_object_permission(self, request, view, obj):
+        return obj.user == request.user
+    
