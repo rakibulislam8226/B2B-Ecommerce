@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import OrganizationEmployee, OrganizationConnection, Address
+from store.custom_permissions import IsOrganizationAdminOrOwner
 from .serializers import OrganizationSerializer, OrganizationEmployeeSerializer, OrganizationConnectionSerializer, \
                         AddressSerializer
 
@@ -33,7 +34,7 @@ class CreateOrganizationAPI(generics.CreateAPIView):
 class OrganizationEmployeeAPIView(APIView):
     """Organizations Employees all api"""
 
-    permission_classes = [IsAuthenticated] # create custom permission
+    permission_classes = [IsOrganizationAdminOrOwner]
 
     def get(self, request, pk=None):
         if pk is not None:
@@ -43,6 +44,7 @@ class OrganizationEmployeeAPIView(APIView):
                 return Response(serializer.data)
             except OrganizationEmployee.DoesNotExist:
                 return Response({"error": "Organization employee not found."}, status=status.HTTP_404_NOT_FOUND)
+        #TODO: Override to get only own ogranizations employees list
         
         organization_employees = OrganizationEmployee.objects.filter()
         serializer = OrganizationEmployeeSerializer(organization_employees, many=True)
@@ -82,11 +84,11 @@ class CreateOrganizationsConnectionsAPI(generics.CreateAPIView):
 
     #FIXME: the request will be auto detect by from_organization. only to_organizations have to set.
     serializer_class = OrganizationConnectionSerializer
-    permission_classes = [IsAuthenticated] # It might be custom permissions only owner can send connection request.
+    permission_classes = [IsOrganizationAdminOrOwner]
 
 
 class OrganizationConnectionAPI(generics.RetrieveUpdateAPIView):
     queryset = OrganizationConnection.objects.filter()
     serializer_class = OrganizationConnectionSerializer
-    permission_classes = [IsAuthenticated] # only permitted user can change the connection status
-    lookup_field = 'id'
+    permission_classes = [IsOrganizationAdminOrOwner]
+    lookup_field = 'id' # Need id or uid?
