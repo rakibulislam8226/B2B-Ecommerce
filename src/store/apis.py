@@ -123,6 +123,7 @@ class CheckoutAPI(generics.CreateAPIView):
             total_price=total_price,
             shipping_address=shipping_address
         )
+        #TODO: Items is not saving yet
         order.items.set(cart_items)
         cart_items.delete()
         serializer = self.get_serializer(order)

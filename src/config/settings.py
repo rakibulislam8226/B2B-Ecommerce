@@ -203,6 +203,8 @@ Q_CLUSTER = {
     }
 }
 
+APPEND_SLASH=False
+
 APP_SITE_HEADER = os.environ.get('APP_SITE_HEADER', 'B2B')
 APP_SITE_TITLE = os.environ.get('APP_SITE_TITLE', 'B2B Admin')
 APP_INDEX_TITLE = os.environ.get('APP_INDEX_TITLE', 'Welcome to B2B Admin')

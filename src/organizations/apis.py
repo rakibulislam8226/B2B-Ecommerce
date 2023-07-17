@@ -4,18 +4,18 @@ from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import OrganizationEmployee, OrganizationConnection, Address
-from store.custom_permissions import IsOrganizationAdminOrOwner
+from store.custom_permissions import IsOrganizationAdminOrOwner, OrganizationsConnectionStatusChangePermission
 from .serializers import OrganizationSerializer, OrganizationEmployeeSerializer, OrganizationConnectionSerializer, \
                         AddressSerializer
 
 
 class AddressListAPI(generics.ListCreateAPIView):
-    queryset = Address.objects.all()
+    queryset = Address.objects.filter()
     serializer_class = AddressSerializer
 
 
 class AddressDetailAPI(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Address.objects.all()
+    queryset = Address.objects.filter()
     serializer_class = AddressSerializer
     lookup_field = 'uid'
 
@@ -43,7 +43,7 @@ class OrganizationEmployeeAPIView(APIView):
                 serializer = OrganizationEmployeeSerializer(organization_employee)
                 return Response(serializer.data)
             except OrganizationEmployee.DoesNotExist:
-                return Response({"error": "Organization employee not found."}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Organization's employee not found."}, status=status.HTTP_404_NOT_FOUND)
         organization_employees = OrganizationEmployee.objects.filter() # if needed then get request user organization id and filter it.
         serializer = OrganizationEmployeeSerializer(organization_employees, many=True)
         return Response(serializer.data)
@@ -89,14 +89,13 @@ class OrganizationEmployeeAPIView(APIView):
 
 
 class CreateOrganizationsConnectionsAPI(generics.CreateAPIView):
-
-    #FIXME: the request will be auto detect by from_organization. only to_organizations have to set.
+    """Organizations connections create"""
     serializer_class = OrganizationConnectionSerializer
-    permission_classes = [IsOrganizationAdminOrOwner]
+    permission_classes = [OrganizationsConnectionStatusChangePermission]
 
 
 class OrganizationConnectionAPI(generics.RetrieveUpdateAPIView):
     queryset = OrganizationConnection.objects.filter()
     serializer_class = OrganizationConnectionSerializer
-    permission_classes = [IsOrganizationAdminOrOwner]
-    lookup_field = 'id' # Need id or uid?
+    permission_classes = [OrganizationsConnectionStatusChangePermission]
+    lookup_field = 'pk' 

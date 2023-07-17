@@ -40,3 +40,32 @@ class IsUserCartOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.user == request.user
     
+
+class OrganizationsConnectionStatusChangePermission(BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        try:
+            organization_employee = user.organization_employee.filter(role__in=["Admin", "Owner"]).first()
+            if organization_employee:
+                return organization_employee.organization.uid
+        except Exception as e:
+            raise PermissionDenied("Invalid permission")
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        try:
+            organization_employee = user.organization_employee.filter(role__in=["Admin", "Owner"]).first()
+            if organization_employee:
+                from_organization_uid = obj.from_organization.uid
+                to_organization_uid = obj.to_organization.uid
+                return (
+                    organization_employee.organization.uid == from_organization_uid
+                    or organization_employee.organization.uid == to_organization_uid
+                )
+        except Exception as e:
+            raise PermissionDenied("Invalid permission")
+        return False
+
+
+    
