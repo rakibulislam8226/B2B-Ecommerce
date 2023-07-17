@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from organizations.models import Organization
-from .models import Products, Category, Cart, CartItem
+from .models import Products, Category, Cart, CartItem, Order
+from organizations.models import Address
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -26,6 +27,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class CartItemSerializer(serializers.ModelSerializer):
     cart = serializers.SlugRelatedField(slug_field='uid', queryset=Cart.objects.filter())
     product = serializers.SlugRelatedField(slug_field='uid', queryset=Products.objects.filter())
+    
     class Meta:
         model = CartItem
         fields = ('uid', 'created_at', 'updated_at', 'cart', 'product', 'quantity')
@@ -49,3 +51,14 @@ class CartSerializer(serializers.ModelSerializer):
 
     def get_total_price(self, obj):
         return obj.total_price
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = CartItemSerializer(many=True) 
+    user = serializers.SlugRelatedField(slug_field='uid', queryset=User.objects.filter())
+    shipping_address = serializers.SlugRelatedField(slug_field='uid', queryset=Address.objects.filter())
+
+    class Meta:
+        model = Order
+        fields = ['uid', 'user', 'items', 'total_price', 'shipping_address', 'created_at', 'updated_at']
+        read_only_fields = ['uid', 'created_at', 'updated_at', 'items']

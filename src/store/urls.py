@@ -1,6 +1,6 @@
 from django.urls import path
 from .apis import ProductCreateAPI, CategoryCreateAPI, ProductListAPI, CartListAPI, CartCreateAPI, \
-    CartItemCreateAPI, CartItemUpdateDeleteAPI
+    CartItemCreateAPI, CartItemUpdateDeleteAPI, CheckoutAPI
 
 
 urlpatterns = [
@@ -14,4 +14,6 @@ urlpatterns = [
     # path('cart-items/<uuid:uid>', CartItemUpdateAPI.as_view(), name='cart-item-update'),
     # path('cart-items/<uuid:uid>', CartItemDeleteAPI.as_view(), name='cart-item-delete'),
     path('cart-items/<uuid:uid>/', CartItemUpdateDeleteAPI.as_view(), name='cart-item-update-delete'),
+
+    path('checkout', CheckoutAPI.as_view(), name='checkout'),
 ]

@@ -5,9 +5,9 @@ from rest_framework.response import Response
 from rest_framework.exceptions import APIException
 from django.db.models import Q
 
-from .models import Products, Category, Cart, CartItem
-from organizations.models import OrganizationConnection
-from .serializers import ProductSerializer, CategorySerializer, CartSerializer, CartItemSerializer
+from .models import Products, Category, Cart, CartItem, Order
+from organizations.models import OrganizationConnection, OrganizationEmployee, Organization, Address
+from .serializers import ProductSerializer, CategorySerializer, CartSerializer, CartItemSerializer, OrderSerializer
 from .custom_permissions import IsInOrganization, IsOrganizationAdminOrOwner, IsUserCartOwner
 
 
@@ -83,7 +83,7 @@ class CartListAPI(generics.ListAPIView):
 
 
 class CartItemUpdateDeleteAPI(generics.RetrieveUpdateDestroyAPIView):
-    queryset = CartItem.objects.all()
+    queryset = CartItem.objects.filter()
     serializer_class = CartItemSerializer
     lookup_field = 'uid'
 
@@ -92,3 +92,40 @@ class CartItemUpdateDeleteAPI(generics.RetrieveUpdateDestroyAPIView):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response({'detail': 'Cart item deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class CheckoutAPI(generics.CreateAPIView):
+    serializer_class = OrderSerializer
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        cart_items = CartItem.objects.filter(cart__user=user)
+
+        if not cart_items.exists():
+            return Response({"error": "Cart is empty."}, status=status.HTTP_400_BAD_REQUEST)
+
+        total_price = sum(item.product.price * item.quantity for item in cart_items)
+
+        # Employee shipping address
+        try:
+            organization_employee = user.organization_employee.first()
+            shipping_address = organization_employee.organization.address
+        except OrganizationEmployee.DoesNotExist:
+            return Response({"error": "User is not associated with any organization."}, status=status.HTTP_400_BAD_REQUEST)
+        except Organization.DoesNotExist:
+            return Response({"error": "Organization not found."}, status=status.HTTP_400_BAD_REQUEST)
+        except Address.DoesNotExist:
+            return Response({"error": "Shipping address not found."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create the order
+        order = Order.objects.create(
+            user=user,
+            total_price=total_price,
+            shipping_address=shipping_address
+        )
+        order.items.set(cart_items)
+        cart_items.delete()
+        serializer = self.get_serializer(order)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
