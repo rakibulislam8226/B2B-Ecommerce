@@ -24,14 +24,10 @@ class IsOrganizationAdminOrOwner(BasePermission):
         try:
             organization_employee = user.organization_employee.filter(role__in=["Admin", "Owner"]).first()
             if organization_employee:
-                return True
-                #FIXME: match employee organization id and request organization are same.
-                # organization_id = request.data.get("organization_id")
-                # # print(request.data.dict.organization)
-                # print(request.__dict__['_data'].get("organization__id"))
-                # print(organization_employee.organization_id)
-                # if organization_id:
-                #     return organization_employee.organization_id == organization_id
+                organization_id = request.data.get("organization")
+                user_organization_uid = str(organization_employee.organization.uid)
+                if organization_id == user_organization_uid:
+                    return True
         except Exception as e:
             raise PermissionDenied("Invalid permission")
         return False
