@@ -5,9 +5,11 @@ from rest_framework.response import Response
 from rest_framework.exceptions import APIException
 from django.db.models import Q
 
-from .models import Products, Category, Cart, CartItem, Order
+from rest_framework.exceptions import NotFound
+
+from .models import Products, Category, Cart, CartItem, Order, OrderItem
 from organizations.models import OrganizationConnection, OrganizationEmployee, Organization, Address
-from .serializers import ProductSerializer, CategorySerializer, CartSerializer, CartItemSerializer, OrderSerializer
+from .serializers import ProductSerializer, CategorySerializer, CartSerializer, CartItemSerializer, OrderSerializer, OrderItemSerializer
 from .custom_permissions import IsInOrganization, IsOrganizationAdminOrOwner, IsUserCartOwner
 
 
@@ -87,12 +89,6 @@ class CartItemUpdateDeleteAPI(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CartItemSerializer
     lookup_field = 'uid'
 
-    def destroy(self, request, *args, **kwargs):
-        """Just for show deleted response"""
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response({'detail': 'Cart item deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
-
 
 class CheckoutAPI(generics.CreateAPIView):
     serializer_class = OrderSerializer
@@ -111,7 +107,7 @@ class CheckoutAPI(generics.CreateAPIView):
             organization_employee = user.organization_employee.first()
             shipping_address = organization_employee.organization.address
         except OrganizationEmployee.DoesNotExist:
-            return Response({"error": "User is not associated with any organization."}, status=status.HTTP_400_BAD_REQUEST)
+            raise NotFound(detail="User is not associated with any organization.")
         except Organization.DoesNotExist:
             return Response({"error": "Organization not found."}, status=status.HTTP_400_BAD_REQUEST)
         except Address.DoesNotExist:
@@ -130,3 +126,27 @@ class CheckoutAPI(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+class OrderAPI(generics.ListCreateAPIView):
+    queryset = Order.objects.filter()
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+ 
+class OrderDetailAPI(generics.RetrieveUpdateAPIView): # RetrieveUpdateDestroyAPIView :P
+    queryset = Order.objects.filter()
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'pk' 
+
+
+class OrderItemsAPI(generics.ListCreateAPIView):
+    queryset = OrderItem.objects.filter()
+    serializer_class = OrderItemSerializer
+    permission_classes = [IsAuthenticated]
+
+ 
+class OrderItemsDetailAPI(generics.RetrieveUpdateDestroyAPIView):
+    queryset = OrderItem.objects.filter()
+    serializer_class = OrderItemSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'uid' 

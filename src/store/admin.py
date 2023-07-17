@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Products, Cart, CartItem, Order
+from .models import Category, Products, Cart, CartItem, Order, OrderItem
 
 # Register your models here.
 
@@ -29,4 +29,17 @@ class CartItemAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at', 'uid')
 
 
-admin.site.register(Order)
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('uid', 'created_at', 'updated_at', 'user', 'total_price', 'shipping_address')
+    readonly_fields = ('created_at', 'updated_at', 'uid')
+
+
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ('uid', 'created_at', 'updated_at', 'order', 'product', 'quantity', 'unit_price')
+    readonly_fields = ('created_at', 'updated_at', 'uid')
+
+
+
+

@@ -70,10 +70,18 @@ class CartItem(TimeStampMixin):
 
 class Order(TimeStampMixin):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    items = models.ManyToManyField(CartItem, related_name='orders')
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    shipping_address = models.ForeignKey("organizations.Address", on_delete=models.RESTRICT)
-
+    shipping_address = models.JSONField(default=dict)
 
     def __str__(self):
         return f"Order #{self.pk}  -- {self.user}"
+
+
+class OrderItem(TimeStampMixin):
+    order = models.ForeignKey(Order, on_delete=models.RESTRICT)
+    product = models.ForeignKey(Products, on_delete=models.RESTRICT)
+    quantity = models.PositiveIntegerField()
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Order #{self.pk}  -- {self.order}"

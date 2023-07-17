@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from organizations.models import Organization
-from .models import Products, Category, Cart, CartItem, Order
+from .models import Products, Category, Cart, CartItem, Order, OrderItem
 from organizations.models import Address
 from django.contrib.auth import get_user_model
 
@@ -54,11 +54,19 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    items = CartItemSerializer(many=True) 
     user = serializers.SlugRelatedField(slug_field='uid', queryset=User.objects.filter())
-    shipping_address = serializers.SlugRelatedField(slug_field='uid', queryset=Address.objects.filter())
 
     class Meta:
         model = Order
-        fields = ['uid', 'user', 'items', 'total_price', 'shipping_address', 'created_at', 'updated_at']
-        read_only_fields = ['uid', 'created_at', 'updated_at', 'items']
+        fields = ['uid', 'user', 'total_price', 'shipping_address', 'created_at', 'updated_at']
+        read_only_fields = ['uid', 'created_at', 'updated_at']
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = serializers.SlugRelatedField(slug_field='uid', queryset=Products.objects.filter())
+    order = serializers.SlugRelatedField(slug_field='uid', queryset=Order.objects.filter())
+
+    class Meta:
+        model = OrderItem
+        fields = ['uid', 'created_at', 'updated_at', 'order', 'product', 'quantity', 'unit_price']
+        read_only_fields = ['uid', 'created_at', 'updated_at']
