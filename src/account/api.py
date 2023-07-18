@@ -7,11 +7,13 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-from .serializers import UserSerializer, LoginSerializer
+from .serializers import UserSerializer, LoginSerializer, LogoutTestSerializer, RegisterUserSerializers
 
 User = get_user_model()
 
 class RegisterUserAPIView(APIView):
+    serializer_class = RegisterUserSerializers
+
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -59,6 +61,8 @@ class LoginAPI(APIView):
 class LogoutAPI(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = LogoutTestSerializer
+
 
     def post(self, request):
         # Simply delete the token to force a user to authenticate again

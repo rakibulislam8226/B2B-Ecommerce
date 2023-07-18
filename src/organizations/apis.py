@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import OrganizationEmployee, OrganizationConnection, Address
 from store.custom_permissions import IsOrganizationAdminOrOwner, OrganizationsConnectionStatusChangePermission
 from .serializers import OrganizationSerializer, OrganizationEmployeeSerializer, OrganizationConnectionSerializer, \
-                        AddressSerializer
+                        AddressSerializer, OrganizationsEmployeeTestSerialiser
 
 
 class AddressListAPI(generics.ListCreateAPIView):
@@ -19,11 +19,6 @@ class AddressDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AddressSerializer
     lookup_field = 'uid'
 
-    def destroy(self, request, *args, **kwargs):
-        """Just for show the confirmations the deleted response"""
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response({'detail': 'Address deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
 
 
 class CreateOrganizationAPI(generics.CreateAPIView):
@@ -32,6 +27,8 @@ class CreateOrganizationAPI(generics.CreateAPIView):
 
 
 class OrganizationEmployeeAPIView(APIView):
+    serializer_class = OrganizationsEmployeeTestSerialiser #Just for skipping the warning in terminal which i got during swagger load
+
     """Organizations Employees all api"""
 
     permission_classes = [IsOrganizationAdminOrOwner]

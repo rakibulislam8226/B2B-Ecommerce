@@ -12,12 +12,12 @@ urlpatterns = [
     path('/list/carts', CartCreateAPI.as_view(), name='cart-create'),
     path('/list/carts/items', CartItemCreateAPI.as_view(), name='cart-items-create'),
     path('/list/carts', CartListAPI.as_view(), name='cart-list'),
-    path('/detail/cart-item/<uuid:uid>', CartItemUpdateDeleteAPI.as_view(), name='cart-item-update-delete'),
+    path('/detail/cart-items/<uuid:uid>', CartItemUpdateDeleteAPI.as_view(), name='cart-item-update-delete'),
 
-    path('/detail/list/orders', OrderAPI.as_view(), name='order-list'),
-    path('/orders/<int:pk>', OrderDetailAPI.as_view(), name='order-detail'),
+    path('/list/orders', OrderAPI.as_view(), name='order-list'),
+    path('/detail/orders/<int:pk>', OrderDetailAPI.as_view(), name='order-detail'),
     path('/list/orders-items', OrderItemsAPI.as_view(), name='order-items'),
     path('/detail/orders-items/<str:uid>', OrderItemsDetailAPI.as_view(), name='order-items-detail'),
 
-    path('/checkout', CheckoutAPI.as_view(), name='checkout'),
+    path('/list/checkout', CheckoutAPI.as_view(), name='checkout'),
 ]

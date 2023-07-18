@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
 from django.db.models import Q
-
+from django.db.models import Sum
 from rest_framework.exceptions import NotFound
 
 from .models import Products, Category, Cart, CartItem, Order, OrderItem
@@ -73,7 +73,7 @@ class CartListAPI(generics.ListAPIView):
     def get_queryset(self):
         """ Authenticated user can see his own carts details only. """
         user = self.request.user
-        return Cart.objects.filter(user=user)
+        return Cart.objects.filter(user=user) 
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -100,7 +100,10 @@ class CheckoutAPI(generics.CreateAPIView):
         if not cart_items.exists():
             return Response({"error": "Cart is empty."}, status=status.HTTP_400_BAD_REQUEST)
 
-        total_price = sum(item.product.price * item.quantity for item in cart_items)
+        total_price = cart_items.aggregate(total=Sum('product__price'))['total']
+
+        if total_price is None:
+            total_price = 0
 
         # Employee shipping address
         try:
@@ -109,9 +112,9 @@ class CheckoutAPI(generics.CreateAPIView):
         except OrganizationEmployee.DoesNotExist:
             raise NotFound(detail="User is not associated with any organization.")
         except Organization.DoesNotExist:
-            return Response({"error": "Organization not found."}, status=status.HTTP_400_BAD_REQUEST)
+            raise NotFound(detail="Organization not found.")
         except Address.DoesNotExist:
-            return Response({"error": "Shipping address not found."}, status=status.HTTP_400_BAD_REQUEST)
+            raise NotFound(detail="Shipping address not found.")
 
         # Create the order
         order = Order.objects.create(
@@ -126,27 +129,29 @@ class CheckoutAPI(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class OrderAPI(generics.ListCreateAPIView):
-    queryset = Order.objects.filter()
+class UserSpecificOrderMixin:
+    def get_queryset(self):
+        user = self.request.user
+        return Order.objects.filter(user=user)
+
+
+class OrderAPI(UserSpecificOrderMixin, generics.ListCreateAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
  
-class OrderDetailAPI(generics.RetrieveUpdateAPIView): # RetrieveUpdateDestroyAPIView :P
-    queryset = Order.objects.filter()
+class OrderDetailAPI(UserSpecificOrderMixin, generics.RetrieveUpdateAPIView): # RetrieveUpdateDestroyAPIView :P
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'pk' 
 
 
-class OrderItemsAPI(generics.ListCreateAPIView):
-    queryset = OrderItem.objects.filter()
+class OrderItemsAPI(UserSpecificOrderMixin, generics.ListCreateAPIView):
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
 
  
-class OrderItemsDetailAPI(generics.RetrieveUpdateDestroyAPIView):
-    queryset = OrderItem.objects.filter()
+class OrderItemsDetailAPI(UserSpecificOrderMixin, generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'uid' 

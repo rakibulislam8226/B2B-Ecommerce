@@ -37,3 +37,9 @@ class LogoutSerializer(serializers.Serializer):
             RefreshToken(self.token).blacklist()
         except TokenError:
             self.fail('bad token')
+
+class LogoutTestSerializer(serializers.Serializer):
+    pass
+
+class RegisterUserSerializers(serializers.Serializer):
+    pass

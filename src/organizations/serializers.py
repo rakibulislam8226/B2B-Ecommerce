@@ -14,7 +14,7 @@ class AddressSerializer(serializers.ModelSerializer):
         fields = ('uid', 'house_no', 'village', 'post_office', 'thana', 'district', 'address')
         read_only_fields = ('uid', 'address')
 
-    def address(self, obj):
+    def address(self, obj)  -> str:
         return obj.address
 
 
@@ -37,6 +37,10 @@ class OrganizationEmployeeSerializer(serializers.ModelSerializer):
         model = OrganizationEmployee
         fields = ('uid', 'created_at', 'updated_at', 'user', 'slug', 'organization', 'role', 'is_default')
         read_only_fields = ('uid', 'created_at', 'updated_at')
+
+        
+class OrganizationsEmployeeTestSerialiser(serializers.Serializer):
+    pass
 
 
 class OrganizationConnectionSerializer(serializers.ModelSerializer):
