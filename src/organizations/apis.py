@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .models import OrganizationEmployee, OrganizationConnection, Address
+from .models import OrganizationEmployee, OrganizationConnection, Address, Organization
 from store.custom_permissions import IsOrganizationAdminOrOwner, OrganizationsConnectionStatusChangePermission
 from .serializers import OrganizationSerializer, OrganizationEmployeeSerializer, OrganizationConnectionSerializer, \
                         AddressSerializer, OrganizationsEmployeeTestSerialiser
@@ -24,6 +24,12 @@ class AddressDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 class CreateOrganizationAPI(generics.CreateAPIView):
     serializer_class = OrganizationSerializer
     permission_classes = [IsAuthenticated]
+
+
+class OrganizationDetailAPI(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Organization.objects.filter()
+    serializer_class = OrganizationSerializer
+    lookup_field = 'uid'
 
 
 class OrganizationEmployeeAPIView(APIView):
