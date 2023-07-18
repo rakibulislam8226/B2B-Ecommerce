@@ -1,8 +1,10 @@
-from rest_framework import serializers
-from store.models import Category
 from django.contrib.auth import get_user_model
+
+from rest_framework import serializers
+
 from .models import Organization, OrganizationEmployee, OrganizationConnection, Address
-from account.serializers import UserSerializer
+
+from store.models import Category
 
 User = get_user_model()
 

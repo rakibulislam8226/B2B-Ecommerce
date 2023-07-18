@@ -1,7 +1,9 @@
 from django.db import models
-from autoslug import AutoSlugField
-from config.models.TimeStampMixin import TimeStampMixin
 from django.contrib.auth import get_user_model
+
+from config.models.TimeStampMixin import TimeStampMixin
+
+from autoslug import AutoSlugField
 
 
 User = get_user_model()

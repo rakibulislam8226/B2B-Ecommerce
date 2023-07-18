@@ -1,12 +1,14 @@
+from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate
+
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.contrib.auth import get_user_model
-from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+
 from .serializers import UserSerializer, LoginSerializer, LogoutTestSerializer, RegisterUserSerializers
 
 User = get_user_model()

@@ -1,6 +1,7 @@
 from rest_framework.permissions import BasePermission
 from rest_framework.exceptions import PermissionDenied
-from .models import Products, Cart
+
+from .models import Products
 
 
 class IsInOrganization(BasePermission):

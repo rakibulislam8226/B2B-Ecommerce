@@ -1,7 +1,9 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
 from config.models.TimeStampMixin import TimeStampMixin
 from phonenumber_field.modelfields import PhoneNumberField
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
 
 
 class UserManager(BaseUserManager):

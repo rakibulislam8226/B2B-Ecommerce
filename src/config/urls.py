@@ -3,6 +3,8 @@ from django.urls import path, include
 from django.conf import settings
 from drf_spectacular.views import SpectacularSwaggerView, SpectacularAPIView, SpectacularRedocView
 
+from store.apis import CategoryCreateAPI
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -10,6 +12,8 @@ urlpatterns = [
     path('account/', include('account.urls')),
     path('we', include('organizations.urls')),
     path('we', include('store.urls')),
+
+    path('/api/categories', CategoryCreateAPI.as_view(), name='category-create'),
 
     path('api-auth/', include('rest_framework.urls')),
 

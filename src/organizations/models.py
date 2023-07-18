@@ -1,10 +1,15 @@
 from django.db import models
-import uuid
-from config.models.TimeStampMixin import TimeStampMixin
 from django.contrib.auth import get_user_model
-from autoslug import AutoSlugField
-from store.models import Category
+
 from .choices import EMPLOYEE_ROLE, CONNECTION_STATUS
+
+from config.models.TimeStampMixin import TimeStampMixin
+from store.models import Category
+
+import uuid
+from autoslug import AutoSlugField
+
+
 
 # Create your models here.
 User = get_user_model()
@@ -59,7 +64,7 @@ class OrganizationEmployee(TimeStampMixin):
 
 class OrganizationConnection(TimeStampMixin):
 
-    from_organization = models.ForeignKey(Organization, on_delete=models.RESTRICT, related_name='from_organization')
+    from_organization = models.ForeignKey(Organization, on_delete=models.RESTRICT, related_name='from_organization') #change name
     to_organization = models.ForeignKey(Organization, on_delete=models.RESTRICT, related_name='to_organization')
     connection_type = models.CharField(max_length=255, choices=CONNECTION_STATUS, default='Pending')
 

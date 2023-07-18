@@ -1,16 +1,19 @@
-import uuid
+from django.db.models import Q
+from django.db.models import Sum
+
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
-from django.db.models import Q
-from django.db.models import Sum
 from rest_framework.exceptions import NotFound
 
 from .models import Products, Category, Cart, CartItem, Order, OrderItem
-from organizations.models import OrganizationConnection, OrganizationEmployee, Organization, Address
 from .serializers import ProductSerializer, CategorySerializer, CartSerializer, CartItemSerializer, OrderSerializer, OrderItemSerializer
 from .custom_permissions import IsInOrganization, IsOrganizationAdminOrOwner, IsUserCartOwner
+
+from organizations.models import OrganizationConnection, OrganizationEmployee, Organization, Address
+
+import uuid
 
 
 class CategoryCreateAPI(generics.CreateAPIView):
@@ -27,7 +30,7 @@ class ProductCreateAPI(generics.CreateAPIView):
 
 class ProductListAPI(generics.ListAPIView):
     serializer_class = ProductSerializer
-    permission_classes = [IsInOrganization] # Not necessary to Custom permission that only organizations employee can see.
+    permission_classes = [IsInOrganization]
 
     def get_queryset(self):
         user = self.request.user
@@ -47,16 +50,17 @@ class CartCreateAPI(generics.CreateAPIView):
     serializer_class = CartSerializer
     permission_classes = [IsAuthenticated]
 
+    # check it
     def perform_create(self, serializer):
         user = self.request.user
 
         if Cart.objects.filter(user=user).exists():
-            raise APIException("A cart already exists for this user.")
+            raise APIException(detail="A cart already exists for this user.") # NotFound
 
         try:
             serializer.save(user=user, uid=uuid.uuid4())
         except Exception as e:
-            raise APIException("Failed to create the cart. Please try again.")
+            raise APIException(detail="Failed to create the cart. Please try again.")
 
 
 
@@ -80,7 +84,7 @@ class CartListAPI(generics.ListAPIView):
         serializer = self.get_serializer(queryset, many=True)
 
         if not queryset.exists():
-            return Response({"message": "Your cart is empty"}, status=status.HTTP_200_OK)
+            return Response({"message": "Your cart is empty"}, status=status.HTTP_200_OK) # 204 status.
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -98,7 +102,7 @@ class CheckoutAPI(generics.CreateAPIView):
         cart_items = CartItem.objects.filter(cart__user=user)
 
         if not cart_items.exists():
-            return Response({"error": "Cart is empty."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Cart is empty."}, status=status.HTTP_400_BAD_REQUEST) # validation error dajngo ar.
 
         total_price = cart_items.aggregate(total=Sum('product__price'))['total']
 
@@ -135,23 +139,37 @@ class UserSpecificOrderMixin:
         return Order.objects.filter(user=user)
 
 
-class OrderAPI(UserSpecificOrderMixin, generics.ListCreateAPIView):
+class OrderAPI(generics.ListCreateAPIView):
+    # queryset = Order.objects.filter()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
  
-class OrderDetailAPI(UserSpecificOrderMixin, generics.RetrieveUpdateAPIView): # RetrieveUpdateDestroyAPIView :P
+class OrderDetailAPI(generics.RetrieveUpdateDestroyAPIView): # RetrieveUpdateDestroyAPIView :P
+    queryset = OrderItem.objects.filter()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'pk' 
 
+    def get_queryset(self):
+        user = self.request.user
+        return Order.objects.filter(user=user)
 
-class OrderItemsAPI(UserSpecificOrderMixin, generics.ListCreateAPIView):
+
+class OrderItemsAPI(generics.ListCreateAPIView):
+    queryset = OrderItem.objects.filter()
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
 
+
  
-class OrderItemsDetailAPI(UserSpecificOrderMixin, generics.RetrieveUpdateDestroyAPIView):
+class OrderItemsDetailAPI(generics.RetrieveUpdateDestroyAPIView):
+    queryset = OrderItem.objects.filter()
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'uid' 
+
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     return OrderItem.objects.filter(user=user)
+
