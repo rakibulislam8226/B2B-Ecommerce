@@ -15,6 +15,8 @@ urlpatterns = [
 
     path('/api/categories', CategoryCreateAPI.as_view(), name='category-create'),
 
+    path("__debug__/", include("debug_toolbar.urls")),
+    
     path('api-auth/', include('rest_framework.urls')),
 
     # Swagger

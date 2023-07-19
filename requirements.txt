@@ -10,3 +10,4 @@ django-phonenumber-field==7.1.0
 django-phonenumbers==1.0.1
 drf-spectacular==0.26.3
 django-autoslug==1.9.9
+django-debug-toolbar==4.1.0

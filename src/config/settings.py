@@ -47,6 +47,7 @@ CUSTOM_INSTALL_APPS = [
     'rest_framework.authtoken',
     'django_q',
     'drf_spectacular',
+    "debug_toolbar",
 
 
     # Install apps
@@ -61,6 +62,7 @@ INSTALLED_APPS = list(DEFAULT_APPS) + [app for app in CUSTOM_INSTALL_APPS if app
 AUTH_USER_MODEL = 'account.User'
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -207,6 +209,11 @@ Q_CLUSTER = {
 }
 
 APPEND_SLASH=False
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "0.0.0.0",
+]
 
 APP_SITE_HEADER = os.environ.get('APP_SITE_HEADER', 'B2B')
 APP_SITE_TITLE = os.environ.get('APP_SITE_TITLE', 'B2B Admin')
