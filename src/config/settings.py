@@ -50,6 +50,7 @@ CUSTOM_INSTALL_APPS = [
     "drf_spectacular",
     "debug_toolbar",
     "axes",
+    
     # Install apps
     "account",
     "organizations",
