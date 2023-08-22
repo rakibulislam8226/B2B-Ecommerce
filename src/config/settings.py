@@ -167,9 +167,14 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",  # For unauthenticated users only.
+        "rest_framework.throttling.UserRateThrottle",  # For site users.
+    ],
+    "DEFAULT_THROTTLE_RATES": {"anon": "50/day", "user": "1000/day"},
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 2,
+    "PAGE_SIZE": 20,
 }
 
 SPECTACULAR_SETTINGS = {
