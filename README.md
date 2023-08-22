@@ -10,13 +10,12 @@
 * Throttling
 * Swagger
 * Django debug toolbar
-
-
 ---
 
 <div align="center">
-  <h3>Setup guide</h3>
+  <h3>Setup guide.</h3>
 </div>
+
 #### Clone the repo
 ```
 git clone git@github.com:rakibulislam8226/B2B-Ecommerce.git
@@ -76,12 +75,9 @@ python manage.py migrate
 python manage.py runserver
   ```
 ---
-<div align="center">
-  <h2>Project Structure</h2>
-</div>
+### Project Structure
 ```
 B2B-Ecommerce
-.
 .
 ├── account
 │   ├── activation.py
@@ -132,8 +128,4 @@ B2B-Ecommerce
     ├── tests.py
     ├── urls.py
     └── views.py
-
 ```
-<div align="center">
-  <h2>Thank you</h2>
-</div>
