@@ -1,3 +1,7 @@
+from datetime import timedelta
+from django.utils import timezone
+from axes.models import AccessAttempt
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
 
@@ -38,6 +42,10 @@ class RegisterUserAPIView(APIView):
 
 
 class LoginAPI(APIView):
+    """
+    Login api with axes and some custom limitations.
+    """
+
     serializer_class = LoginSerializer
 
     def post(self, request):
@@ -45,24 +53,64 @@ class LoginAPI(APIView):
         serializer.is_valid(raise_exception=True)
         phone = serializer.validated_data["phone"]
         password = serializer.validated_data["password"]
-        user = authenticate(phone=phone, password=password)
+
+        # Get the client IP address from the request's META dictionary
+        ip_address = request.META.get("REMOTE_ADDR")
+
+        # Check if user is already locked out
+        user_locked_out = AccessAttempt.objects.filter(
+            username=phone, ip_address=ip_address, failures_since_start__gte=3
+        ).first()
+
+        if user_locked_out:
+            if user_locked_out.failures_since_start >= 3:
+                if (
+                    user_locked_out.attempt_time + timedelta(minutes=15)
+                    > timezone.now()
+                ):
+                    remaining_time = (
+                        user_locked_out.attempt_time
+                        + timedelta(minutes=15)
+                        - timezone.now()
+                    )
+                    return Response(
+                        {
+                            "error": f"Account temporarily blocked. Please try again after {remaining_time.total_seconds()//60} minutes."
+                        }
+                    )
+                else:
+                    """Reset failed login attempts since the cooldown period is over"""
+                    user_locked_out.failures_since_start = 0
+                    user_locked_out.save()
+
+        user = authenticate(request=request, username=phone, password=password)
 
         if user is not None:
+            AccessAttempt.objects.filter(username=phone, ip_address=ip_address).delete()
+
             # Generate tokens
             refresh = RefreshToken.for_user(user)
             access = AccessToken.for_user(user)
-            token, created = Token.objects.get_or_create(user=user)
+            token, created = Token.objects.get_or_create(
+                user=user
+            )  # NOTE: Token is use just for testing. it not necessary.
 
-            # Create response data
             response_data = {
                 "refresh_token": str(refresh),
                 "access_token": str(access),
                 "token": (token.key),  # For testing
             }
             return Response(response_data)
-        return Response(
-            {"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
-        )
+        else:
+            """Create or update failed login attempt record"""
+            attempt, created = AccessAttempt.objects.get_or_create(
+                username=phone, ip_address=ip_address
+            )
+            attempt.failures_since_start += 1
+            attempt.attempt_time = timezone.now()
+            attempt.save()
+
+            return Response({"error": "Invalid credentials"})
 
 
 class LogoutAPI(APIView):

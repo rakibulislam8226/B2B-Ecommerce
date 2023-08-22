@@ -49,6 +49,7 @@ CUSTOM_INSTALL_APPS = [
     "django_q",
     "drf_spectacular",
     "debug_toolbar",
+    "axes",
     # Install apps
     "account",
     "organizations",
@@ -70,6 +71,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "axes.middleware.AxesMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -92,6 +94,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -217,3 +223,17 @@ INTERNAL_IPS = [
 APP_SITE_HEADER = os.environ.get("APP_SITE_HEADER", "B2B")
 APP_SITE_TITLE = os.environ.get("APP_SITE_TITLE", "B2B Admin")
 APP_INDEX_TITLE = os.environ.get("APP_INDEX_TITLE", "Welcome to B2B Admin")
+
+
+AXES_LOGIN_FAILURE_LIMIT = 3  # Number of allowed login attempts before lockout
+AXES_LOCK_OUT_AT_FAILURE = (
+    True  # Whether to lock out users after exceeding login failure limit
+)
+AXES_COOLOFF_TIME = timedelta(
+    minutes=15
+)  # Time period for which failed attempts are counted
+AXES_VERBOSE = True  # Whether to log Axes actions in the console
+
+
+# exclude specific IP addresses from being locked out
+# AXES_IP_WHITELIST = ['127.0.0.1']
